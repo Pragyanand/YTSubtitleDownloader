@@ -1,6 +1,6 @@
-# YT Subtitle Manager
+# YT Subtitle Downloader
 
-**YT Subtitle Manager** is a desktop automation tool designed to help creators, researchers, and archivists batch-download subtitles from multiple YouTube channels efficiently.
+**YT Subtitle Downloader** is a desktop automation tool designed to help creators, researchers, and archivists batch-download subtitles from multiple YouTube channels efficiently.
 
 ---
 
@@ -133,3 +133,4 @@ Chrome will open automatically and process the selected videos.
 
 - This tool is intended for educational, archival, and personal use.
 - Respect YouTube’s Terms of Service and content creator rights.
+
