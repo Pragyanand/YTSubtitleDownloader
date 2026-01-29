@@ -14,3 +14,7 @@ TempChromeProfile/
 *.log
 uploads/
 TempChromeProfile/
+delete_duplicate.py
+youtube_link_opener.py
+subtitleDownloadScript.txt
+run.py
