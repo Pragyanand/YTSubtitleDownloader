@@ -199,9 +199,9 @@
 
     // --- EVENT LISTENERS ---
 
-    // 1. Initial Load
+    // 1. Initial Load (Increased delay for Selenium automation)
     if (getVideoId()) {
-        setTimeout(clickTranscript, 2000); // Wait for page hydration
+        setTimeout(clickTranscript, 5000); // Wait longer for page hydration in automation
     }
 
     // 2. Navigation (SPA behavior)

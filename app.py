@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from werkzeug.utils import secure_filename
 from services.youtube_service import fetch_channel_videos_generator
-from services.browser_service import open_videos_stream_generator
+import services.browser_service as browser_service
 
 from flask_cors import CORS
 import json
@@ -40,6 +40,10 @@ def append_log(data):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/guide')
+def guide():
+    return render_template('guide.html')
 
 @app.route('/api/log', methods=['POST'])
 def log_status():
@@ -79,7 +83,7 @@ def open_videos_stream():
     if not video_urls:
          return jsonify({"error": "No videos provided"}), 400
 
-    return Response(stream_with_context(browser_service_open_videos_generator(video_urls, download_dir, chromedriver_path)), 
+    return Response(stream_with_context(browser_service.open_videos_generator(video_urls, download_dir, chromedriver_path)), 
                    mimetype='text/plain')
 
 @app.route('/fetch-stream')
@@ -191,4 +195,24 @@ def browse_file():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Open browser automatically
+    import webbrowser
+    from threading import Timer
+
+    def open_browser():
+        # Try to open in Edge explicitly if possible, else default
+        try:
+            # Edge path usually: msedge
+            # Register edge
+            edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+            if os.path.exists(edge_path):
+                webbrowser.register('edge', None, webbrowser.BackgroundBrowser(edge_path))
+                webbrowser.get('edge').open("http://127.0.0.1:5000")
+            else:
+                webbrowser.open("http://127.0.0.1:5000")
+        except:
+            webbrowser.open("http://127.0.0.1:5000")
+
+    Timer(1.5, open_browser).start()
+    # Host='127.0.0.1' ensures it only listens locally, avoiding some Firewall prompts
+    app.run(debug=True, port=5000, host='127.0.0.1')
