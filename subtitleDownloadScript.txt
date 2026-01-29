@@ -1,0 +1,138 @@
+// ==UserScript==
+// @name         YouTube Auto Transcript Opener & Downloader
+// @namespace    http://tampermonkey.net/
+// @version      3.0
+// @description  Open transcript panel and download transcript as text file
+// @match        https://www.youtube.com/watch*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    let lastVideoId = null;
+    let attempts = 0;
+    const maxAttempts = 15;
+
+    function getVideoId() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('v');
+    }
+
+    function getVideoTitle() {
+        const titleElement = document.querySelector('h1.ytd-video-primary-info-renderer yt-formatted-string, h1.style-scope.ytd-watch-metadata');
+        return titleElement ? titleElement.textContent.trim() : 'transcript';
+    }
+
+    function sanitizeFileName(name) {
+        return name.replace(/[\\/:*?"<>|]/g, '_').substring(0, 200);
+    }
+
+    function isTranscriptOpen() {
+        const transcriptBtn = document.querySelector('button[aria-label*="transcript"]');
+        return transcriptBtn && transcriptBtn.getAttribute('aria-label').includes('Hide');
+    }
+
+    function extractAndDownloadTranscript() {
+        const container = document.querySelector('#segments-container');
+
+        if (!container) {
+            console.log('Transcript container not found yet...');
+            return false;
+        }
+
+        const segments = container.querySelectorAll('ytd-transcript-segment-renderer');
+
+        if (segments.length === 0) {
+            console.log('No transcript segments found yet...');
+            return false;
+        }
+
+        let transcriptText = '';
+
+        segments.forEach(segment => {
+            const textElement = segment.querySelector('.segment-text');
+            if (textElement) {
+                transcriptText += textElement.textContent.trim() + ' ';
+            }
+        });
+
+        if (transcriptText.trim().length === 0) {
+            return false;
+        }
+
+        // Create and download the file
+        const videoTitle = getVideoTitle();
+        const fileName = sanitizeFileName(videoTitle) + '_transcript.txt';
+
+        const blob = new Blob([transcriptText.trim()], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        console.log('Transcript downloaded:', fileName);
+        return true;
+    }
+
+    function waitForTranscriptAndDownload() {
+        let downloadAttempts = 0;
+        const maxDownloadAttempts = 20;
+
+        const checkInterval = setInterval(() => {
+            downloadAttempts++;
+
+            if (extractAndDownloadTranscript()) {
+                clearInterval(checkInterval);
+            } else if (downloadAttempts >= maxDownloadAttempts) {
+                console.log('Could not extract transcript after maximum attempts');
+                clearInterval(checkInterval);
+            }
+        }, 500);
+    }
+
+    function clickTranscript() {
+        const currentVideoId = getVideoId();
+
+        if (currentVideoId !== lastVideoId) {
+            attempts = 0;
+            lastVideoId = currentVideoId;
+        }
+
+        if (attempts >= maxAttempts) {
+            return;
+        }
+
+        if (isTranscriptOpen()) {
+            waitForTranscriptAndDownload();
+            return;
+        }
+
+        attempts++;
+
+        const transcriptBtn = document.querySelector('button[aria-label="Show transcript"]');
+
+        if (transcriptBtn) {
+            transcriptBtn.click();
+            // Wait for panel to open and load
+            setTimeout(() => {
+                waitForTranscriptAndDownload();
+            }, 1000);
+            return;
+        }
+
+        setTimeout(clickTranscript, 800);
+    }
+
+    window.addEventListener('yt-navigate-finish', () => {
+        setTimeout(clickTranscript, 1500);
+    });
+
+    if (getVideoId()) {
+        setTimeout(clickTranscript, 2000);
+    }
+})();

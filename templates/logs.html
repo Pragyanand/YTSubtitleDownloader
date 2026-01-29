@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto rounded-xl overflow-hidden shadow-lg border border-slate-700 bg-slate-800">
+    <div class="p-6 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+        <h2 class="text-xl font-bold text-white">Automation Logs</h2>
+        <button onclick="window.location.reload()" class="text-xs text-teal-400 hover:text-teal-300">Refresh</button>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-700">
+            <thead class="bg-slate-900">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Video</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Message
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-slate-800 divide-y divide-slate-700/50">
+                {% for log in logs %}
+                <tr class="hover:bg-slate-700/30 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500 font-mono">
+                        {{ log.timestamp.split('T')[1].split('.')[0] }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span
+                            class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full border {{ 'bg-teal-900/30 text-teal-300 border-teal-500/30' if log.status == 'SUCCESS' else 'bg-red-900/30 text-red-300 border-red-500/30' }}">
+                            {{ log.status }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-200 max-w-xs truncate" title="{{ log.title }}">
+                        {{ log.title[:40] }}..
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-400">
+                        {{ log.message }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="px-6 py-12 text-center text-slate-500">
+                        <p class="mb-2">No logs found yet.</p>
+                        <p class="text-xs">Start automation from the Process page to see data here.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

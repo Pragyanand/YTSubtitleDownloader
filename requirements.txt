@@ -1,0 +1,8 @@
+flask
+pandas
+openpyxl
+google-api-python-client
+selenium
+webdriver-manager
+flask-cors
+isodate

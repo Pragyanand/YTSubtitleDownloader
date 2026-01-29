@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT Subtitle Manager - Workflow</title>
+    <!-- Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151F2E',
+                            900: '#0F172A',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0F172A;
+            /* Slate-900 */
+            color: #F8FAFC;
+        }
+
+        .header-solid {
+            background-color: #0F172A;
+            border-bottom: 1px solid #1E293B;
+        }
+
+        .card-solid {
+            background-color: #1E293B;
+            /* Slate-800 mostly */
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            /* rounded-xl */
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Simple Functional Navbar -->
+    <header class="header-solid sticky top-0 z-50">
+        <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                    </svg>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-white">YT Subtitle Manager</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-6">
+                <a href="{{ url_for('index') }}"
+                    class="text-sm font-medium text-slate-300 hover:text-white transition-colors">New Session</a>
+                <a href="{{ url_for('process_page') }}"
+                    class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Current Data</a>
+                <a href="{{ url_for('tutorial') }}"
+                    class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Help</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="mb-8 space-y-2">
+                {% for category, message in messages %}
+                <div class="p-4 rounded-lg flex items-center gap-3 border
+                                        {% if category == 'success' %} bg-green-900/20 border-green-900/50 text-green-400
+                                        {% elif category == 'error' %} bg-red-900/20 border-red-900/50 text-red-400
+                                        {% else %} bg-slate-800 border-slate-700 text-slate-300 {% endif %}">
+                    <span class="font-medium text-sm">{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900 py-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-600">
+            &copy; 2026 TubeAutomator. Local Execution Environment.
+        </div>
+    </footer>
+
+</body>
+
+</html>
